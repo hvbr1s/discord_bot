@@ -18,7 +18,7 @@ async def hello(ctx):
 
 @bot.command()
 async def ask(ctx, *, question):
-    url = 'https://api-bot-affq.onrender.com/gpt'
+    url = ''
     data = {'user_input': question}
     headers = {'Content-Type': 'application/json'}
 
@@ -32,6 +32,6 @@ async def ask(ctx, *, question):
         else:
             await ctx.send("The 'output' key was not found in the API response.")
     else:
-        await ctx.send(f"Request failed with status code {response.status_code}.")
+        await ctx.send(f"*Sad beep* - I'm sorry, I couldn't understand your question. Please ask me again.")
 
 bot.run(bot_token)
