@@ -11,3 +11,4 @@ pathlib
 fastapi
 pydantic
 discord
+dotenv
