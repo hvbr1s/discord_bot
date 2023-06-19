@@ -18,7 +18,7 @@ async def hello(ctx):
 
 @bot.command()
 async def ask(ctx, *, question):
-    url = 'http://127.0.0.1:8000/gpt'
+    url = 'https://api-bot-affq.onrender.com/gpt'
     data = {'user_input': question}
     headers = {'Content-Type': 'application/json'}
 
