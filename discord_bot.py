@@ -18,6 +18,7 @@ async def hello(ctx):
 
 @bot.command()
 async def ask(ctx, *, question):
+    #url = 'http://127.0.0.1:8000/gpt'
     url = ''
     data = {'user_input': question}
     headers = {'Content-Type': 'application/json'}
@@ -28,10 +29,10 @@ async def ask(ctx, *, question):
         response_json = response.json()
 
         if 'output' in response_json:
-            await ctx.send(response_json['output'])
+            await ctx.send(f"{ctx.author.mention}, {response_json['output']}")
         else:
-            await ctx.send("The 'output' key was not found in the API response.")
+            await ctx.send(f"{ctx.author.mention}, The 'output' key was not found in the API response.")
     else:
-        await ctx.send(f"*Sad beep* - I'm sorry, I couldn't understand your question. Please ask me again.")
+        await ctx.send(f"{ctx.author.mention}, *Sad beep* - I'm sorry I couldn't understand your question, please ask me again.")
 
 bot.run(bot_token)
