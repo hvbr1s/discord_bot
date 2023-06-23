@@ -16,9 +16,10 @@ async def hello(ctx):
     await ctx.send('Hello, how can I help?')
 
 @bot.command()
+@commands.cooldown(1, 20, commands.BucketType.user)
 async def ask(ctx, *, question):
     url = 'http://127.0.0.1:8000/gpt'
-    #url = ''
+    #url = 'https://api-bot-affq.onrender.com/gpt'
     data = {'user_input': question}
     headers = {'Content-Type': 'application/json'}
 
@@ -34,4 +35,13 @@ async def ask(ctx, *, question):
     else:
         await ctx.reply(f"*Sad beep* - I'm sorry I couldn't understand your question, please ask me again.")
 
+@ask.error
+async def ask_error(ctx, error):
+    if isinstance(error, commands.CommandOnCooldown):
+        msg = 'Not too fast! Please ask me again in {:.0f}s.'.format(error.retry_after)
+        await ctx.reply(msg)
+    else:
+        raise error
+
 bot.run(bot_token)
+
