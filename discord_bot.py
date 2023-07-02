@@ -18,8 +18,8 @@ async def hello(ctx):
 @bot.command()
 @commands.cooldown(1, 20, commands.BucketType.user)
 async def ask(ctx, *, question):
-    url = 'http://127.0.0.1:8000/gpt'
-    #url = 'https://api-bot-affq.onrender.com/gpt'
+    #url = 'http://127.0.0.1:8000/gpt'
+    url = 'https://34.163.86.35:80/gpt'
     data = {'user_input': question}
     headers = {'Content-Type': 'application/json'}
 
