@@ -19,7 +19,7 @@ async def hello(ctx):
 @commands.cooldown(1, 20, commands.BucketType.user)
 async def ask(ctx, *, question):
     #url = 'http://127.0.0.1:8000/gpt'
-    url = 'http://34.163.86.35:80/gpt'
+    url = ''
     data = {'user_input': question}
     headers = {'Content-Type': 'application/json'}
 
