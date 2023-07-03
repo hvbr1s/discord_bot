@@ -13,7 +13,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 async def answer_question(ctx, question):
     #url = 'http://127.0.0.1:8008/gpt'
-    #url = 'https://34.163.86.35:80/gpt'
+    #url = ''
     data = {'user_input': question}
     headers = {'Content-Type': 'application/json'}
 
