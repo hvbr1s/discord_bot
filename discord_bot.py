@@ -34,13 +34,12 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 async def answer_question(ctx, question):
     url = 'http://127.0.0.1:8008/gpt'
-    #data = {'user_input': question}
     data = {'user_input': question, 'user_id': str(ctx.author.id)}
-    headers = {'Content-Type': 'application/json'}
+    headers = {'Content-Type': 'application/json', "Authorization": f"Bearer {os.getenv('BACKEND_API_KEY')}"} #changed
 
     try:
-        response = requests.post(url, json=data, headers=headers)
-        response.raise_for_status()  # raise an HTTPError if the response contains an HTTP error status code
+        response = requests.post(url, json=data, headers=headers) #changed
+        response.raise_for_status()  
 
         response_json = response.json()
 
