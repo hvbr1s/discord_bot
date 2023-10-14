@@ -1,0 +1,8 @@
+openai
+python-dotenv==1.0.0
+uuid
+pathlib
+fastapi
+pydantic
+discord
+nltk
