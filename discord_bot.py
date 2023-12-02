@@ -30,7 +30,11 @@ thread_counter = 0
 async def answer_question(ctx, question):
    global thread_counter
    url = 'http://127.0.0.1:8800/gpt'
-   data = {'user_input': question, 'user_id': str(ctx.author.id), 'user_locale':'eng'}
+# Append thread id to user id if the context is a thread
+   user_id = str(ctx.author.id)
+   if isinstance(ctx.channel, Thread):
+       user_id += f"-{ctx.channel.id}"
+   data = {'user_input': question, 'user_id': user_id, 'user_locale':'eng'}
    headers = {'Content-Type': 'application/json', "Authorization": f"Bearer {os.getenv('BACKEND_API_KEY')}"}
 
    async with aiohttp.ClientSession() as session:
