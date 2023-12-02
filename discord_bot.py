@@ -27,24 +27,29 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 
 async def answer_question(ctx, question):
-    url = 'http://127.0.0.1:8800/gpt'
-    data = {'user_input': question, 'user_id': str(ctx.author.id), 'user_locale':'eng'}
-    headers = {'Content-Type': 'application/json', "Authorization": f"Bearer {os.getenv('BACKEND_API_KEY')}"}
+   url = 'http://127.0.0.1:8800/gpt'
+   data = {'user_input': question, 'user_id': str(ctx.author.id), 'user_locale':'eng'}
+   headers = {'Content-Type': 'application/json', "Authorization": f"Bearer {os.getenv('BACKEND_API_KEY')}"}
 
-    async with aiohttp.ClientSession() as session:
-        try:
-            async with session.post(url, json=data, headers=headers) as response:
-                if response.status == 200:
-                    response_json = await response.json()
-                    if 'output' in response_json:
-                        await ctx.reply(f"{response_json['output']}")
-                    else:
-                        await ctx.reply(f"The 'output' key was not found in the API response.")
-                else:
-                    await ctx.reply(f"*Sad beep* - I'm sorry I couldn't reach my knowledge base. Please try again later.")
-        except Exception as e:
-            print(f"Error occurred while sending request: {e}")
-            await ctx.reply(f"*Sad beep* - I'm sorry I couldn't reach my knowledge base. Please try again later.")
+   async with aiohttp.ClientSession() as session:
+       try:
+           async with session.post(url, json=data, headers=headers) as response:
+               if response.status == 200:
+                  response_json = await response.json()
+                  if 'output' in response_json:
+                      thread = await ctx.create_thread(name="SamanthaBot")
+                      await thread.send(f"{response_json['output']}")
+                  else:
+                      thread = await ctx.create_thread(name="SamanthaBot")
+                      await thread.send(f"The 'output' key was not found in the API response.")
+               else:
+                  thread = await ctx.create_thread(name="SamanthaBot")
+                  await thread.send(f"*Sad beep* - I'm sorry I couldn't reach my knowledge base. Please try again later.")
+       except Exception as e:
+           print(f"Error occurred while sending request: {e}")
+           thread = await ctx.create_thread(name="SamanthaBot")
+           await thread.send(f"*Sad beep* - I'm sorry I couldn't reach my knowledge base. Please try again later.")
+
 
 @bot.event
 async def on_message(message):
