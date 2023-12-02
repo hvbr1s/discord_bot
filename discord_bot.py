@@ -7,6 +7,7 @@ if not nltk.data.find('tokenizers/punkt'):
     nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 from discord.ext import commands
+from discord import Thread
 from dotenv import main
 import aiohttp
 
@@ -24,11 +25,10 @@ SOLANA_ADDRESS_PATTERN= r'\b[1-9A-HJ-NP-Za-km-z]{32,44}\b'
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
-
-
-from discord import Thread
+thread_counter = 0
 
 async def answer_question(ctx, question):
+   global thread_counter
    url = 'http://127.0.0.1:8800/gpt'
    data = {'user_input': question, 'user_id': str(ctx.author.id), 'user_locale':'eng'}
    headers = {'Content-Type': 'application/json', "Authorization": f"Bearer {os.getenv('BACKEND_API_KEY')}"}
@@ -40,26 +40,30 @@ async def answer_question(ctx, question):
                   response_json = await response.json()
                   if 'output' in response_json:
                       if not isinstance(ctx.channel, Thread):  # Check if the message is not in a thread
-                          thread = await ctx.create_thread(name="SamanthaBot")
+                          thread_counter += 1
+                          thread = await ctx.create_thread(name=f"SamanthaBot#{thread_counter}")
                           await thread.send(f"{response_json['output']}")
                       else:  # If the message is in a thread, reply to the message instead
                           await ctx.reply(f"{response_json['output']}")
                   else:
                       if not isinstance(ctx.channel, Thread):
-                          thread = await ctx.create_thread(name="SamanthaBot")
+                          thread_counter += 1
+                          thread = await ctx.create_thread(name=f"SamanthaBot#{thread_counter}")
                           await thread.send(f"The 'output' key was not found in the API response.")
                       else:
                           await ctx.reply(f"The 'output' key was not found in the API response.")
                else:
                   if not isinstance(ctx.channel, Thread):
-                      thread = await ctx.create_thread(name="SamanthaBot")
+                      thread_counter += 1
+                      thread = await ctx.create_thread(name=f"SamanthaBot#{thread_counter}")
                       await thread.send(f"*Sad beep* - I'm sorry I couldn't reach my knowledge base. Please try again later.")
                   else:
                       await ctx.reply(f"*Sad beep* - I'm sorry I couldn't reach my knowledge base. Please try again later.")
        except Exception as e:
            print(f"Error occurred while sending request: {e}")
            if not isinstance(ctx.channel, Thread):
-               thread = await ctx.create_thread(name="SamanthaBot")
+               thread_counter += 1
+               thread = await ctx.create_thread(name=f"SamanthaBot#{thread_counter}")
                await thread.send(f"*Sad beep* - I'm sorry I couldn't reach my knowledge base. Please try again later.")
            else:
                await ctx.reply(f"*Sad beep* - I'm sorry I couldn't reach my knowledge base. Please try again later.")
