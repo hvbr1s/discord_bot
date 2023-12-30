@@ -14,7 +14,7 @@ import aiohttp
 main.load_dotenv()
 bot_token=os.getenv("BOT_TOKEN")
 
-ETHEREUM_ADDRESS_PATTERN = r'\b0x[a-fA-F0-9]{40}\b'
+EVM_ADDRESS_PATTERN = r'\b0x[a-fA-F0-9]{40}\b'
 BITCOIN_ADDRESS_PATTERN = r'\b(1|3)[1-9A-HJ-NP-Za-km-z]{25,34}\b|bc1[a-zA-Z0-9]{25,90}\b'
 LITECOIN_ADDRESS_PATTERN = r'\b(L|M)[a-km-zA-HJ-NP-Z1-9]{26,34}\b'
 DOGECOIN_ADDRESS_PATTERN = r'\bD{1}[5-9A-HJ-NP-U]{1}[1-9A-HJ-NP-Za-km-z]{32}\b'
@@ -75,7 +75,7 @@ async def answer_question(ctx, question):
 async def on_message(message):
     if bot.user.mentioned_in(message):
         question = message.content.replace(f'<@!{bot.user.id}>', '').strip()  # extract question
-        if re.search(ETHEREUM_ADDRESS_PATTERN, question, re.IGNORECASE) or \
+        if re.search(EVM_ADDRESS_PATTERN, question, re.IGNORECASE) or \
            re.search(BITCOIN_ADDRESS_PATTERN, question, re.IGNORECASE) or \
            re.search(LITECOIN_ADDRESS_PATTERN, question, re.IGNORECASE) or \
            re.search(DOGECOIN_ADDRESS_PATTERN, question, re.IGNORECASE) or \
