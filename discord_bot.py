@@ -1,6 +1,5 @@
 import discord
 import os
-import requests
 import re
 import nltk
 if not nltk.data.find('tokenizers/punkt'):
@@ -10,11 +9,12 @@ from discord.ext import commands
 from discord import Thread
 from dotenv import main
 import aiohttp
+import asyncio
 
 main.load_dotenv()
 bot_token=os.getenv("BOT_TOKEN")
 
-EVM_ADDRESS_PATTERN = r'\b0x[a-fA-F0-9]{40}\b'
+ETHEREUM_ADDRESS_PATTERN = r'\b0x[a-fA-F0-9]{40}\b'
 BITCOIN_ADDRESS_PATTERN = r'\b(1|3)[1-9A-HJ-NP-Za-km-z]{25,34}\b|bc1[a-zA-Z0-9]{25,90}\b'
 LITECOIN_ADDRESS_PATTERN = r'\b(L|M)[a-km-zA-HJ-NP-Z1-9]{26,34}\b'
 DOGECOIN_ADDRESS_PATTERN = r'\bD{1}[5-9A-HJ-NP-U]{1}[1-9A-HJ-NP-Za-km-z]{32}\b'
@@ -30,6 +30,7 @@ thread_counter = 0
 async def answer_question(ctx, question):
    global thread_counter
    url = 'http://127.0.0.1:8800/gpt'
+   #url = 'https://knowlbot.aws.stg.ldg-tech.com/gpt'
 # Append thread id to user id if the context is a thread
    user_id = str(ctx.author.id)
    if isinstance(ctx.channel, Thread):
@@ -75,16 +76,30 @@ async def answer_question(ctx, question):
 async def on_message(message):
     if bot.user.mentioned_in(message):
         question = message.content.replace(f'<@!{bot.user.id}>', '').strip()  # extract question
-        if re.search(EVM_ADDRESS_PATTERN, question, re.IGNORECASE) or \
+
+        # Check for crypto addresses
+        if re.search(ETHEREUM_ADDRESS_PATTERN, question, re.IGNORECASE) or \
            re.search(BITCOIN_ADDRESS_PATTERN, question, re.IGNORECASE) or \
            re.search(LITECOIN_ADDRESS_PATTERN, question, re.IGNORECASE) or \
            re.search(DOGECOIN_ADDRESS_PATTERN, question, re.IGNORECASE) or \
            re.search(COSMOS_ADDRESS_PATTERN, question, re.IGNORECASE) or \
            re.search(SOLANA_ADDRESS_PATTERN, question, re.IGNORECASE) or \
-           re.search(XRP_ADDRESS_PATTERN, question, re.IGNORECASE) :
-            await message.reply("I'm sorry, but I can't assist with questions that crypto addresses. Please remove the address and ask again.")
+           re.search(XRP_ADDRESS_PATTERN, question, re.IGNORECASE):
+            await message.reply("I'm sorry, but I can't assist with questions that include crypto addresses. Please remove the address and ask again.")
         else:
-            await answer_question(message, question)
+            # Create a task for answer_question
+            task = asyncio.create_task(answer_question(message, question))
+
+            # Wait for 5 seconds to see if the task completes
+            done, pending = await asyncio.wait({task}, timeout=5)
+
+            # If the task is still pending after 5 seconds, send an interim response
+            if task in pending:
+                await message.reply("I am checking my knowledge base, it usually takes me about 20 seconds.")
+
+            # Wait for the task to complete and get the result
+            await task
+
     await bot.process_commands(message)
 
 @bot.command()
