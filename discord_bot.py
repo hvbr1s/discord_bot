@@ -91,11 +91,11 @@ async def on_message(message):
             task = asyncio.create_task(answer_question(message, question))
 
             # Wait for 5 seconds to see if the task completes
-            done, pending = await asyncio.wait({task}, timeout=5)
+            done, pending = await asyncio.wait({task}, timeout=8)
 
             # If the task is still pending after 5 seconds, send an interim response
             if task in pending:
-                await message.reply("I am checking my knowledge base, it usually takes me about 20 seconds.")
+                await message.reply("Thanks, I am checking my knowledge base, it usually takes me about 20 seconds.")
 
             # Wait for the task to complete and get the result
             await task
