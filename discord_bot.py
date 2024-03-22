@@ -29,8 +29,9 @@ thread_counter = 0
 
 async def answer_question(ctx, question):
    global thread_counter
-   url = 'http://127.0.0.1:8800/gpt'
+   #url = 'http://127.0.0.1:8800/chat'
    #url = 'https://knowlbot.aws.stg.ldg-tech.com/gpt'
+   url = 'https://knowlbot.aws.stg.ldg-tech.com/chat'
 # Append thread id to user id if the context is a thread
    user_id = str(ctx.author.id)
    if isinstance(ctx.channel, Thread):
@@ -91,7 +92,7 @@ async def on_message(message):
             task = asyncio.create_task(answer_question(message, question))
 
             # Wait for 5 seconds to see if the task completes
-            done, pending = await asyncio.wait({task}, timeout=8)
+            done, pending = await asyncio.wait({task}, timeout=15)
 
             # If the task is still pending after 5 seconds, send an interim response
             if task in pending:
@@ -108,8 +109,16 @@ async def ask(ctx, *, question):
     if re.search(ETHEREUM_ADDRESS_PATTERN, question, re.IGNORECASE) or re.search(BITCOIN_ADDRESS_PATTERN, question, re.IGNORECASE):
         await ctx.reply("I'm sorry, but I can't assist with questions that include Ethereum or Bitcoin addresses. Please remove the address and ask again.")
     else:
-        await answer_question(ctx, question)
-
+        try:
+            await answer_question(ctx, question)
+        except discord.errors.Forbidden as e:
+            print(f"Missing permissions to create a thread or reply: {e}")
+            # Optionally, log this error to a file or external logging service
+            await ctx.send("I don't have the permissions to create threads or reply in this channel.")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            # Handle other unexpected errors gracefully
+            await ctx.send("An error occurred, please try again later.")
 @ask.error
 async def ask_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
@@ -119,3 +128,6 @@ async def ask_error(ctx, error):
         raise error
 
 bot.run(bot_token)
+
+# start command: pm2 start discord_bot.py --interpreter=python3
+# stop command: pm2 stop discord_bot
