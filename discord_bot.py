@@ -29,7 +29,8 @@ thread_counter = 0
 
 async def answer_question(ctx, question):
    global thread_counter
-   url = 'http://127.0.0.1:8800/chat'
+   #url = 'http://127.0.0.1:8800/chat'
+   url = 'https://retailbot.staging.aws.ledger.fr/agent'
 # Append thread id to user id if the context is a thread
    user_id = str(ctx.author.id)
    if isinstance(ctx.channel, Thread):
